@@ -1,0 +1,32 @@
+openapi: 3.0.1
+info:
+    version: 1.0.0
+    title: Calculate service
+servers:
+    - url: localhost:8989
+
+
+paths:
+    /calculate:
+        get:
+            requestBody:
+                description:  json with two int values
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                a:
+                                    type: integer
+                                b:
+                                    type: integer
+                required: true
+            responses:
+                '200':
+                    description: OK
+                '400':
+                    description: error
+                    content: { "error":"Incorrect input"}
+
+
+
