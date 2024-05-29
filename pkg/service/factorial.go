@@ -1,7 +1,11 @@
 package service
 
-func CalculateFactorial(n int, res chan int) {
+import "sync"
+
+func CalculateFactorial(wg *sync.WaitGroup, n int, res chan int) {
+	defer wg.Done()
 	res <- factorial(n)
+
 	return
 }
 

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
+	"sync"
 )
 
 func Calculate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -17,19 +18,23 @@ func Calculate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	var wg sync.WaitGroup
+	a := make(chan int)
+	b := make(chan int)
+	wg.Add(2)
+	go service.CalculateFactorial(&wg, data.A, a)
+	go service.CalculateFactorial(&wg, data.B, b)
 
-	res := make(chan int)
-	go service.CalculateFactorial(data.A, res)
-	go service.CalculateFactorial(data.B, res)
-
-	resp := toResponse(<-res, <-res)
+	resp := toResponse(<-a, <-b)
+	wg.Wait()
 	fmt.Fprintf(w, resp)
 }
 
 func toResponse(a int, b int) string {
-	e := responseError{
-		Error: msg,
+	resp := FactorialResp{
+		A: a,
+		B: b,
 	}
-	res, _ := json.Marshal(e)
+	res, _ := json.Marshal(resp)
 	return string(res)
 }

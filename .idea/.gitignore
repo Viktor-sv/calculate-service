@@ -6,3 +6,6 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+/calculate-service.iml
+/modules.xml
+/vcs.xml
