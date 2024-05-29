@@ -1,7 +1,8 @@
 package service
 
-func CalculateFactorial(n int) int {
-	return factorial(n)
+func CalculateFactorial(n int, res chan int) {
+	res <- factorial(n)
+	return
 }
 
 func factorial(n int) int {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"calculate-service/pkg/server/handler/calculate"
+	"calculate-service/pkg/server/handler/middleware"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"log"
@@ -14,8 +15,6 @@ func main() {
 
 	fmt.Print("hello")
 	router := httprouter.New()
-	//TODO add middleware
-	router.POST("/"+calculate, hanlder.Calculate)
-
+	router.POST("/"+calculate, middleware.Validate(hanlder.Calculate))
 	log.Fatal(http.ListenAndServe("localhost:8989", router))
 }
