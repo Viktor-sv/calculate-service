@@ -17,7 +17,7 @@ import (
 const calculate = "calculate"
 
 func main() {
-
+	shutdownChannel := make(chan struct{})
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGHUP,
 		syscall.SIGINT,
@@ -33,15 +33,18 @@ func main() {
 		IdleTimeout: 60 * time.Second,
 	}
 
+	// server start
+	go func() {
+		fmt.Printf("sing: %v", <-signals)
+		close(shutdownChannel)
+	}()
+
 	go func() {
 		err := s.ListenAndServe()
 		if err != nil {
 			log.Fatal(err)
 		}
 	}()
-
-	sig := <-signals
-	fmt.Println("shutdown: ", sig)
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	s.Shutdown(ctx)
+	<-shutdownChannel
+	_ = s.Shutdown(context.Background())
 }
