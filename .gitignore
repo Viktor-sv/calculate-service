@@ -1,0 +1,7 @@
+bin
+.idea/
+*.out
+*.exe
+# coverage
+coverage.html
+coverage.out

@@ -3,6 +3,7 @@ package middleware
 import (
 	"bytes"
 	"calculate-service/pkg/errors"
+	"calculate-service/pkg/server/handler"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -16,11 +17,11 @@ func Validate(h httprouter.Handle) httprouter.Handle {
 		r.Body.Close() //  must close
 		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
-		var b []byte
-		_ = json.Unmarshal(bodyBytes, &b)
+		var b handler.FactorialRequest
+		err = json.Unmarshal(bodyBytes, &b)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintf(w, errors.ResponseError(errors.IncorrectInputError))
+			fmt.Fprintf(w, "%s", errors.ResponseError(errors.IncorrectInputError))
 			return
 		}
 		h(w, r, ps)
