@@ -1,6 +1,6 @@
 package hanlder
 
 type FactorialResp struct {
-	A int `json:"a"`
-	B int `json:"b"`
+	A uint64 `json:"a"`
+	B uint64 `json:"b"`
 }

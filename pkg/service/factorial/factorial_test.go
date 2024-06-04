@@ -1,9 +1,11 @@
-package service
+package factorial
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFactorialSuccess(t *testing.T) {
-	wanted := 120
+	var wanted uint64 = 120
 	res := factorial(5)
 	if res != wanted {
 		t.Errorf("Calc factorial fail: fact %d, want %d", res, wanted)

@@ -13,12 +13,12 @@ import (
 
 func Validate(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		bodyBytes, err := io.ReadAll(r.Body)
+		bodyBytes, _ := io.ReadAll(r.Body)
 		r.Body.Close() //  must close
 		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 		var b handler.FactorialRequest
-		err = json.Unmarshal(bodyBytes, &b)
+		err := json.Unmarshal(bodyBytes, &b)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, "%s", errors.ResponseError(errors.IncorrectInputError))

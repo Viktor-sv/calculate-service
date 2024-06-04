@@ -1,16 +1,25 @@
 package hanlder
 
 import (
-	"calculate-service/pkg/service"
+	model "calculate-service/pkg/server/model/factorial"
+	"calculate-service/pkg/service/factorial"
 	"calculate-service/utils"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
-	"sync"
 )
 
-func Calculate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+type Handler struct {
+	factorial.Service
+}
+
+func NewHandler(s *factorial.Service) *Handler {
+	return &Handler{*s}
+}
+
+func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
 	data, err := utils.ParseBody(r.Body)
@@ -18,22 +27,19 @@ func Calculate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	var wg sync.WaitGroup
-	a := make(chan int)
-	b := make(chan int)
-	wg.Add(2)
-	go service.CalculateFactorial(&wg, data.A, a)
-	go service.CalculateFactorial(&wg, data.B, b)
 
-	resp := toResponse(<-a, <-b)
-	wg.Wait()
-	fmt.Fprintf(w, resp)
+	res, err := h.Factorial(context.Background(), data)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	fmt.Fprintf(w, toResponse(res))
 }
 
-func toResponse(a int, b int) string {
+func toResponse(f *model.Factorial) string {
 	resp := FactorialResp{
-		A: a,
-		B: b,
+		A: f.A,
+		B: f.B,
 	}
 	res, _ := json.Marshal(resp)
 	return string(res)
